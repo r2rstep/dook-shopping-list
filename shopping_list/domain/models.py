@@ -36,9 +36,10 @@ class ShoppingList:
                     ingredient_in_fridge = next(
                         filter(lambda in_fridge: in_fridge.name == ingredient_in_recipe.name,
                                self._ingredients_in_fridge))
-                    quantity_to_buy = ingredient_in_recipe.quantity - ingredient_in_fridge.quantity
+                    quantity_to_buy = ingredient_in_recipe.quantity - ingredient_in_fridge.quantity + \
+                                      ingredient_in_fridge.allocated_quantity
                     # neglect possible mismatch of units for now
-                    if ingredient_in_fridge.quantity < ingredient_in_recipe.quantity:
+                    if quantity_to_buy > 0:
                         if ingredient_in_recipe.name not in self.items:
                             self.items[ingredient_in_recipe.name] = quantity_to_buy
                         else:
@@ -46,4 +47,7 @@ class ShoppingList:
                     ingredient_in_fridge.allocated_quantity = \
                         ingredient_in_fridge.quantity if quantity_to_buy >= 0 else ingredient_in_recipe.quantity
                 except StopIteration:
-                    self.items[ingredient_in_recipe.name] = ingredient_in_recipe.quantity
+                    if ingredient_in_recipe.name in self.items:
+                        self.items[ingredient_in_recipe.name] += ingredient_in_recipe.quantity
+                    else:
+                        self.items[ingredient_in_recipe.name] = ingredient_in_recipe.quantity
