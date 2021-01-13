@@ -20,6 +20,12 @@ class IngredientInFridge(Ingredient):
     allocated_quantity: float = 0.0
 
 
+def set_allocated_quantity(ingredient_in_fridge: IngredientInFridge, ingredient: Ingredient):
+    ingredient_in_fridge.allocated_quantity += ingredient.quantity
+    if ingredient_in_fridge.allocated_quantity > ingredient_in_fridge.quantity:
+        ingredient_in_fridge.allocated_quantity = ingredient_in_fridge.quantity
+
+
 class Recipe(BaseModel):
     ingredients: List[Ingredient]
 
@@ -32,22 +38,23 @@ class ShoppingList:
     def create(self, recipes: List[Recipe]):
         for recipe in recipes:
             for ingredient_in_recipe in recipe.ingredients:
+                quantity_available_in_fridge = 0
                 try:
                     ingredient_in_fridge = next(
                         filter(lambda in_fridge: in_fridge.name == ingredient_in_recipe.name,
                                self._ingredients_in_fridge))
-                    quantity_to_buy = ingredient_in_recipe.quantity - ingredient_in_fridge.quantity + \
-                                      ingredient_in_fridge.allocated_quantity
-                    # neglect possible mismatch of units for now
-                    if quantity_to_buy > 0:
-                        if ingredient_in_recipe.name not in self.items:
-                            self.items[ingredient_in_recipe.name] = quantity_to_buy
-                        else:
-                            self.items[ingredient_in_recipe.name] += quantity_to_buy
-                    ingredient_in_fridge.allocated_quantity = \
-                        ingredient_in_fridge.quantity if quantity_to_buy >= 0 else ingredient_in_recipe.quantity
+                    quantity_available_in_fridge = ingredient_in_fridge.quantity -\
+                                                   ingredient_in_fridge.allocated_quantity
+                    set_allocated_quantity(ingredient_in_fridge, ingredient_in_recipe)
                 except StopIteration:
-                    if ingredient_in_recipe.name in self.items:
-                        self.items[ingredient_in_recipe.name] += ingredient_in_recipe.quantity
-                    else:
-                        self.items[ingredient_in_recipe.name] = ingredient_in_recipe.quantity
+                    pass
+                # neglect possible mismatch of units for now
+                if quantity_available_in_fridge < ingredient_in_recipe.quantity:
+                    self._add(ingredient_in_recipe, quantity_available_in_fridge)
+    
+    def _add(self, ingredient_in_recipe: Ingredient, quantity_available_in_fridge: float = 0.0):
+        quantity_to_buy = ingredient_in_recipe.quantity - quantity_available_in_fridge
+        if ingredient_in_recipe.name in self.items:
+            self.items[ingredient_in_recipe.name] += quantity_to_buy
+        else:
+            self.items[ingredient_in_recipe.name] = quantity_to_buy
