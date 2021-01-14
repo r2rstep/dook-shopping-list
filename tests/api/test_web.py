@@ -1,0 +1,21 @@
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import Session
+
+from shopping_list import domain
+from shopping_list.api import resp_models
+from ..helpers.data_generators import random_recipe, random_fridge
+
+
+def test_create_shopping_list(db: Session, client: TestClient):
+    recipe = random_recipe(db)
+    fridge = random_fridge(db)
+    shopping_list = client.post(f'/fridges/{fridge.id}/shoppingList',
+                                json=domain.commands.CreateShoppingList(recipes=[recipe.id]).dict())
+    assert shopping_list.status_code == 201
+
+    expected_list = domain.models.ShoppingList(
+        items={ingredient.name: ingredient.quantity for ingredient in recipe.ingredients})
+    resp_data = resp_models.ShoppingList(**shopping_list.json())
+    assert resp_data.shopping_list == expected_list
+    assert resp_data.links.fridge == f'/fridges/{fridge.id}'
+    assert f'/fridges/{fridge.id}/shoppingList' in resp_data.links.self

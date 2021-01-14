@@ -15,9 +15,15 @@ class Ingredient(BaseModel):
     quantity: float
     unit: QuantityUnits
 
+    class Config:
+        orm_mode = True
+
 
 class ProductInFridge(Ingredient):
     allocated_quantity: float = 0.0
+
+    class Config:
+        orm_mode = True
 
 
 def set_allocated_quantity(ingredient_in_fridge: ProductInFridge, ingredient: Ingredient):
@@ -30,9 +36,15 @@ class Recipe(BaseModel):
     id: int = None
     ingredients: List[Ingredient]
 
+    class Config:
+        orm_mode = True
+
 
 class ShoppingList(BaseModel):
     items: Dict[str, float]
+
+    class Config:
+        orm_mode = True
 
 
 @attr.s
@@ -67,8 +79,12 @@ class ShoppingListLogic:
 
 
 class Fridge(BaseModel):
+    id: int = None
     owner: int
     products: List[ProductInFridge]
+
+    class Config:
+        orm_mode = True
 
 
 @attr.s
