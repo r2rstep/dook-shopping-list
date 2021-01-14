@@ -31,12 +31,17 @@ class Recipe(BaseModel):
     ingredients: List[Ingredient]
 
 
+class ShoppingList(BaseModel):
+    items: Dict[str, float]
+
+
 @attr.s
-class ShoppingList:
+class ShoppingListLogic:
     _ingredients_in_fridge: List[ProductInFridge] = attr.ib()
-    items: Dict[str, float] = attr.ib(factory=dict)
+    shopping_list: ShoppingList = None
 
     def create(self, recipes: List[Recipe]):
+        self.shopping_list = ShoppingList(items={})
         for recipe in recipes:
             for ingredient_in_recipe in recipe.ingredients:
                 quantity_available_in_fridge = 0
@@ -55,10 +60,10 @@ class ShoppingList:
     
     def _add(self, ingredient_in_recipe: Ingredient, quantity_available_in_fridge: float = 0.0):
         quantity_to_buy = ingredient_in_recipe.quantity - quantity_available_in_fridge
-        if ingredient_in_recipe.name in self.items:
-            self.items[ingredient_in_recipe.name] += quantity_to_buy
+        if ingredient_in_recipe.name in self.shopping_list.items:
+            self.shopping_list.items[ingredient_in_recipe.name] += quantity_to_buy
         else:
-            self.items[ingredient_in_recipe.name] = quantity_to_buy
+            self.shopping_list.items[ingredient_in_recipe.name] = quantity_to_buy
 
 
 class Fridge(BaseModel):

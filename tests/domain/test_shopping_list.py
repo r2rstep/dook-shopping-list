@@ -13,7 +13,7 @@ def test_create_shopping_list():
         salad_in_fridge,
         goat_cheese_in_fridge]
 
-    shopping_list = models.ShoppingList(ingredients_in_fridge=ingredients_in_fridge)
+    shopping_list = models.ShoppingListLogic(ingredients_in_fridge=ingredients_in_fridge)
     shopping_list.create([
         models.Recipe(
             ingredients=[models.Ingredient(name='salad', quantity=1, unit=models.QuantityUnits.units),
@@ -28,10 +28,10 @@ def test_create_shopping_list():
         )
     ])
 
-    assert shopping_list.items == {'pear': 1,
-                                   'almond': 60,
-                                   'salad': 1,
-                                   'avocado': 2}
+    assert shopping_list.shopping_list.items == {'pear': 1,
+                                                 'almond': 60,
+                                                 'salad': 1,
+                                                 'avocado': 2}
     assert avocado_in_fridge.allocated_quantity == 1.0
     assert salad_in_fridge.allocated_quantity == 1.0
     assert goat_cheese_in_fridge.allocated_quantity == 80.0
