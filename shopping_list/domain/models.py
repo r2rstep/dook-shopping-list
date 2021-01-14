@@ -16,23 +16,24 @@ class Ingredient(BaseModel):
     unit: QuantityUnits
 
 
-class IngredientInFridge(Ingredient):
+class ProductInFridge(Ingredient):
     allocated_quantity: float = 0.0
 
 
-def set_allocated_quantity(ingredient_in_fridge: IngredientInFridge, ingredient: Ingredient):
+def set_allocated_quantity(ingredient_in_fridge: ProductInFridge, ingredient: Ingredient):
     ingredient_in_fridge.allocated_quantity += ingredient.quantity
     if ingredient_in_fridge.allocated_quantity > ingredient_in_fridge.quantity:
         ingredient_in_fridge.allocated_quantity = ingredient_in_fridge.quantity
 
 
 class Recipe(BaseModel):
+    id: int = None
     ingredients: List[Ingredient]
 
 
 @attr.s
 class ShoppingList:
-    _ingredients_in_fridge: List[IngredientInFridge] = attr.ib()
+    _ingredients_in_fridge: List[ProductInFridge] = attr.ib()
     items: Dict[str, float] = attr.ib(factory=dict)
 
     def create(self, recipes: List[Recipe]):
@@ -58,3 +59,19 @@ class ShoppingList:
             self.items[ingredient_in_recipe.name] += quantity_to_buy
         else:
             self.items[ingredient_in_recipe.name] = quantity_to_buy
+
+
+class Fridge(BaseModel):
+    owner: int
+    products: List[ProductInFridge]
+
+
+@attr.s
+class FridgeLogic:
+    fridge: Fridge
+
+    def add_product(self, product: ProductInFridge):
+        pass
+
+    def remove_product(self, product: ProductInFridge):
+        pass

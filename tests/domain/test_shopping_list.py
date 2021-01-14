@@ -2,11 +2,11 @@ from shopping_list.domain import models
 
 
 def test_create_shopping_list():
-    avocado_in_fridge = models.IngredientInFridge(name='avocado', quantity=1, unit=models.QuantityUnits.units)
-    salad_in_fridge = models.IngredientInFridge(name='salad', quantity=1, unit=models.QuantityUnits.units)
-    banana_in_fridge = models.IngredientInFridge(name='banana', quantity=4, unit=models.QuantityUnits.units)
-    goat_cheese_in_fridge = models.IngredientInFridge(name='goat cheese', quantity=100,
-                                                      unit=models.QuantityUnits.gram)
+    avocado_in_fridge = models.ProductInFridge(name='avocado', quantity=1, unit=models.QuantityUnits.units)
+    salad_in_fridge = models.ProductInFridge(name='salad', quantity=1, unit=models.QuantityUnits.units)
+    banana_in_fridge = models.ProductInFridge(name='banana', quantity=4, unit=models.QuantityUnits.units)
+    goat_cheese_in_fridge = models.ProductInFridge(name='goat cheese', quantity=100,
+                                                   unit=models.QuantityUnits.gram)
     ingredients_in_fridge = [
         banana_in_fridge,
         avocado_in_fridge,
