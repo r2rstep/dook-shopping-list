@@ -1,3 +1,5 @@
+import copy
+
 from shopping_list.domain import models
 
 
@@ -34,3 +36,19 @@ def test_create_shopping_list():
     assert next(filter(lambda p: p.name == 'avocado', fridge.products)).allocated_quantity == 1.0
     assert next(filter(lambda p: p.name == 'salad', fridge.products)).allocated_quantity == 1.0
     assert next(filter(lambda p: p.name == 'goat cheese', fridge.products)).allocated_quantity == 80.0
+
+
+def test_adding_product_to_fridge_should_decrease_its_quantity_on_shopping_list():
+    shopping_list = models.ShoppingList(items=dict(pear=1, almond=60, salad=1, avocado=2))
+    expected_list = copy.deepcopy(shopping_list.items)
+    added_products = [models.ProductInFridge(name='pear', quantity=1),
+                      models.ProductInFridge(name='watermelon', quantity=1),
+                      models.ProductInFridge(name='avocado', quantity=1)]
+    del expected_list['pear']
+    expected_list['avocado'] = 1
+
+    logic = models.ShoppingListLogic(models.FridgeLogic(fridge=models.Fridge(owner=0, products=[])),
+                                     shopping_list)
+    logic.update(added_products)
+
+    assert logic.shopping_list.items == expected_list

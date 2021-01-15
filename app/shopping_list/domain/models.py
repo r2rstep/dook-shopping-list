@@ -76,6 +76,13 @@ class ShoppingListLogic:
                 # neglect possible mismatch of units for now
                 if quantity_available_in_fridge < ingredient_in_recipe.quantity:
                     self._add(ingredient_in_recipe, quantity_available_in_fridge)
+
+    def update(self, products_changes: List[ProductInFridge]):
+        for changed_product in products_changes:
+            if changed_product.name in self.shopping_list.items:
+                self.shopping_list.items[changed_product.name] -= changed_product.quantity
+                if not self.shopping_list.items[changed_product.name]:
+                    del self.shopping_list.items[changed_product.name]
     
     def _add(self, ingredient_in_recipe: Ingredient, quantity_available_in_fridge: float = 0.0):
         quantity_to_buy = ingredient_in_recipe.quantity - quantity_available_in_fridge
