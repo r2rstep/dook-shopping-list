@@ -2,11 +2,10 @@ from shopping_list.domain import models
 
 
 def test_create_shopping_list():
-    avocado_in_fridge = models.ProductInFridge(name='avocado', quantity=1, unit=models.QuantityUnits.units)
-    salad_in_fridge = models.ProductInFridge(name='salad', quantity=1, unit=models.QuantityUnits.units)
-    banana_in_fridge = models.ProductInFridge(name='banana', quantity=4, unit=models.QuantityUnits.units)
-    goat_cheese_in_fridge = models.ProductInFridge(name='goat cheese', quantity=100,
-                                                   unit=models.QuantityUnits.gram)
+    avocado_in_fridge = models.ProductInFridge(name='avocado', quantity=1)
+    salad_in_fridge = models.ProductInFridge(name='salad', quantity=1)
+    banana_in_fridge = models.ProductInFridge(name='banana', quantity=4)
+    goat_cheese_in_fridge = models.ProductInFridge(name='goat cheese', quantity=100)
     products_in_fridge = [
         banana_in_fridge,
         avocado_in_fridge,
@@ -17,15 +16,14 @@ def test_create_shopping_list():
     shopping_list = models.ShoppingListLogic(models.FridgeLogic(fridge))
     shopping_list.create([
         models.Recipe(
-            ingredients=[models.Ingredient(name='salad', quantity=1, unit=models.QuantityUnits.units),
-                         models.Ingredient(name='pear', quantity=1, unit=models.QuantityUnits.units),
-                         models.Ingredient(name='almond', quantity=40, unit=models.QuantityUnits.gram),
-                         models.Ingredient(name='goat cheese', quantity=80,
-                                           unit=models.QuantityUnits.gram)]),
+            ingredients=[models.Ingredient(name='salad', quantity=1),
+                         models.Ingredient(name='pear', quantity=1),
+                         models.Ingredient(name='almond', quantity=40),
+                         models.Ingredient(name='goat cheese', quantity=80)]),
         models.Recipe(
-            ingredients=[models.Ingredient(name='avocado', quantity=3, unit=models.QuantityUnits.units),
-                         models.Ingredient(name='almond', quantity=20, unit=models.QuantityUnits.gram),
-                         models.Ingredient(name='salad', quantity=1, unit=models.QuantityUnits.units)]
+            ingredients=[models.Ingredient(name='avocado', quantity=3),
+                         models.Ingredient(name='almond', quantity=20),
+                         models.Ingredient(name='salad', quantity=1)]
         )
     ])
 

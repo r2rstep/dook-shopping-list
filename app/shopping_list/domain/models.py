@@ -1,19 +1,12 @@
-import enum
 from typing import List, Dict
 
 import attr
 from pydantic import BaseModel
 
 
-class QuantityUnits(enum.IntEnum):
-    units = enum.auto()
-    gram = enum.auto()
-
-
 class Ingredient(BaseModel):
     name: str
     quantity: float
-    unit: QuantityUnits
 
     class Config:
         orm_mode = True
