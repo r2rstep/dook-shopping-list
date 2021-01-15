@@ -26,12 +26,6 @@ class ProductInFridge(Ingredient):
         orm_mode = True
 
 
-def set_allocated_quantity(ingredient_in_fridge: ProductInFridge, ingredient: Ingredient):
-    ingredient_in_fridge.allocated_quantity += ingredient.quantity
-    if ingredient_in_fridge.allocated_quantity > ingredient_in_fridge.quantity:
-        ingredient_in_fridge.allocated_quantity = ingredient_in_fridge.quantity
-
-
 class Recipe(BaseModel):
     id: int = None
     ingredients: List[Ingredient]
@@ -47,9 +41,34 @@ class ShoppingList(BaseModel):
         orm_mode = True
 
 
-@attr.s
+class Fridge(BaseModel):
+    id: int = None
+    owner: int
+    products: List[ProductInFridge]
+
+    class Config:
+        orm_mode = True
+
+
+@attr.s(auto_attribs=True)
+class FridgeLogic:
+    fridge: Fridge
+
+    def allocate_product(self, ingredient: Ingredient):
+        ingredient_in_fridge = next(filter(lambda product: product.name == ingredient.name,
+                                           self.fridge.products))
+        ingredient_in_fridge.allocated_quantity += ingredient.quantity
+        this_allocation_quantity = ingredient.quantity
+        if ingredient_in_fridge.allocated_quantity > ingredient_in_fridge.quantity:
+            this_allocation_quantity = ingredient.quantity - (ingredient_in_fridge.allocated_quantity -
+                                                              ingredient_in_fridge.quantity)
+            ingredient_in_fridge.allocated_quantity = ingredient_in_fridge.quantity
+        return this_allocation_quantity
+
+
+@attr.s(auto_attribs=True)
 class ShoppingListLogic:
-    _ingredients_in_fridge: List[ProductInFridge] = attr.ib()
+    _fridge: FridgeLogic
     shopping_list: ShoppingList = None
 
     def create(self, recipes: List[Recipe]):
@@ -58,12 +77,7 @@ class ShoppingListLogic:
             for ingredient_in_recipe in recipe.ingredients:
                 quantity_available_in_fridge = 0
                 try:
-                    ingredient_in_fridge = next(
-                        filter(lambda in_fridge: in_fridge.name == ingredient_in_recipe.name,
-                               self._ingredients_in_fridge))
-                    quantity_available_in_fridge = ingredient_in_fridge.quantity -\
-                                                   ingredient_in_fridge.allocated_quantity
-                    set_allocated_quantity(ingredient_in_fridge, ingredient_in_recipe)
+                    quantity_available_in_fridge = self._fridge.allocate_product(ingredient_in_recipe)
                 except StopIteration:
                     pass
                 # neglect possible mismatch of units for now
@@ -76,23 +90,3 @@ class ShoppingListLogic:
             self.shopping_list.items[ingredient_in_recipe.name] += quantity_to_buy
         else:
             self.shopping_list.items[ingredient_in_recipe.name] = quantity_to_buy
-
-
-class Fridge(BaseModel):
-    id: int = None
-    owner: int
-    products: List[ProductInFridge]
-
-    class Config:
-        orm_mode = True
-
-
-@attr.s
-class FridgeLogic:
-    fridge: Fridge
-
-    def add_product(self, product: ProductInFridge):
-        pass
-
-    def remove_product(self, product: ProductInFridge):
-        pass

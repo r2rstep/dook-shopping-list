@@ -15,7 +15,7 @@ def create_shopping_list(db: Session,
     recipes: List[models.Recipe] = []
     for recipe_id in command.recipes:
         recipes.append(repos.recipe.get(db, id=recipe_id)[1])
-    logic = models.ShoppingListLogic(ingredients_in_fridge=fridge.products)
+    logic = models.ShoppingListLogic(fridge=models.FridgeLogic(fridge=fridge))
     logic.create(recipes)
     repos.shopping_list.add(db, obj_in=logic.shopping_list)
     repos.fridge.update(db, db_obj=fridge_db, obj_in=fridge)
