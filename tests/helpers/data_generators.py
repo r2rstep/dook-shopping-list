@@ -13,7 +13,7 @@ def random_recipe(session: Session) -> models.Recipe:
         recipe.ingredients.append(models.Ingredient(name=random_lower_string(),
                                                     quantity=random.randint(1, 10),
                                                     unit=models.QuantityUnits.units))
-    return repos.recipe.add(session, obj_in=recipe)
+    return repos.recipe.add(session, obj_in=recipe)[1]
 
 
 def random_fridge(session: Session) -> models.Fridge:
@@ -22,4 +22,4 @@ def random_fridge(session: Session) -> models.Fridge:
         fridge.products.append(models.ProductInFridge(name=random_lower_string(),
                                                       quantity=random.randint(1, 10),
                                                       unit=models.QuantityUnits.units))
-    return repos.fridge.add(session, obj_in=fridge)
+    return repos.fridge.add(session, obj_in=fridge)[1]

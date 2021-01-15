@@ -1,4 +1,4 @@
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Generic, Type, TypeVar, Union
 
 from fastapi.encoders import jsonable_encoder  # that's ugly to have API framework dependency in here
 from pydantic import BaseModel
@@ -13,7 +13,7 @@ CreateSchemaType = TypeVar("CreateSchemaType", bound=BaseModel)
 UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 
-class BaseSqlAlchemyRepo(Generic[DomainModelType, DbModelType, CreateSchemaType, UpdateSchemaType]):
+class GenericSqlAlchemyRepo(Generic[DomainModelType, DbModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, db_model: Type[DbModelType], domain_model: Type[DomainModelType]):
         self.db_model = db_model
         self.domain_model = domain_model
@@ -23,18 +23,13 @@ class BaseSqlAlchemyRepo(Generic[DomainModelType, DbModelType, CreateSchemaType,
         domain_obj = self.domain_model.from_orm(db_obj)
         return db_obj, domain_obj
 
-    def get_multi(
-            self, db: Session, *, skip: int = 0, limit: int = 100
-    ) -> List[DomainModelType]:
-        return [self.domain_model.from_orm(obj) for obj in db.query(self.db_model).offset(skip).limit(limit).all()]
-
-    def add(self, db: Session, *, obj_in: CreateSchemaType) -> DomainModelType:
+    def add(self, db: Session, *, obj_in: CreateSchemaType) -> (DbModelType, DomainModelType):
         obj_in_data = jsonable_encoder(obj_in)
         db_obj = self.db_model(**obj_in_data)  # type: ignore
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
-        return self.domain_model.from_orm(db_obj)
+        return db_obj, self.domain_model.from_orm(db_obj)
 
     def update(
             self,
@@ -42,7 +37,7 @@ class BaseSqlAlchemyRepo(Generic[DomainModelType, DbModelType, CreateSchemaType,
             *,
             db_obj: DbModelType,
             obj_in: Union[UpdateSchemaType, Dict[str, Any]]
-    ) -> DomainModelType:
+    ) -> (DbModelType, DomainModelType):
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
             update_data = obj_in
@@ -54,13 +49,13 @@ class BaseSqlAlchemyRepo(Generic[DomainModelType, DbModelType, CreateSchemaType,
         db.add(db_obj)
         db.commit()
         db.refresh(db_obj)
-        return self.domain_model.from_orm(db_obj)
+        return db_obj, self.domain_model.from_orm(db_obj)
 
-    def remove(self, db: Session, *, id: Any) -> DomainModelType:
-        obj = db.query(self.db_model).get(id)
-        db.delete(obj)
+    def remove(self, db: Session, *, id: Any) -> (DbModelType, DomainModelType):
+        db_obj = db.query(self.db_model).get(id)
+        db.delete(db_obj)
         db.commit()
-        return self.domain_model.from_orm(obj)
+        return db_obj, self.domain_model.from_orm(db_obj)
 
     def remove_all(self, db: Session):
         for obj in db.query(self.db_model).all():
@@ -71,16 +66,16 @@ class BaseSqlAlchemyRepo(Generic[DomainModelType, DbModelType, CreateSchemaType,
         return db.query(self.db_model).count()
 
 
-class ShoppingList(BaseSqlAlchemyRepo[
+class ShoppingList(GenericSqlAlchemyRepo[
                        domain.ShoppingList, models.ShoppingList, domain.ShoppingList, domain.ShoppingList]):
     pass
 
 
-class Fridge(BaseSqlAlchemyRepo[domain.Fridge, models.Fridge, domain.Fridge, domain.Fridge]):
+class Fridge(GenericSqlAlchemyRepo[domain.Fridge, models.Fridge, domain.Fridge, domain.Fridge]):
     pass
 
 
-class Recipe(BaseSqlAlchemyRepo[domain.Recipe, models.Recipe, domain.Recipe, domain.Recipe]):
+class Recipe(GenericSqlAlchemyRepo[domain.Recipe, models.Recipe, domain.Recipe, domain.Recipe]):
     pass
 
 
