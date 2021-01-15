@@ -3,4 +3,4 @@ from sqlalchemy.orm import sessionmaker
 
 
 engine = create_engine('sqlite:////tmp/test.db')    # TODO: make this configurable
-session = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine)

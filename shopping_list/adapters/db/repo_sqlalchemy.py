@@ -15,19 +15,13 @@ UpdateSchemaType = TypeVar("UpdateSchemaType", bound=BaseModel)
 
 class BaseSqlAlchemyRepo(Generic[DomainModelType, DbModelType, CreateSchemaType, UpdateSchemaType]):
     def __init__(self, db_model: Type[DbModelType], domain_model: Type[DomainModelType]):
-        """
-        CRUD object with default methods to Create, Read, Update, Delete (CRUD).
-
-        **Parameters**
-
-        * `model`: A SQLAlchemy model class
-        * `schema`: A Pydantic model (schema) class
-        """
         self.db_model = db_model
         self.domain_model = domain_model
 
-    def get(self, db: Session, id: Any) -> Optional[DomainModelType]:
-        return self.domain_model.from_orm(db.query(self.db_model).filter(self.db_model.id == id).first())
+    def get(self, db: Session, id: Any) -> (DbModelType, DomainModelType):
+        db_obj = db.query(self.db_model).filter(self.db_model.id == id).first()
+        domain_obj = self.domain_model.from_orm(db_obj)
+        return db_obj, domain_obj
 
     def get_multi(
             self, db: Session, *, skip: int = 0, limit: int = 100

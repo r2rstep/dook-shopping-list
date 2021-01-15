@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+import pytest
 from sqlalchemy.orm import Session
 
 from shopping_list import domain
@@ -6,6 +7,7 @@ from shopping_list.api import resp_models
 from ..helpers.data_generators import random_recipe, random_fridge
 
 
+@pytest.mark.end2end
 def test_create_shopping_list(db: Session, client: TestClient):
     recipe = random_recipe(db)
     fridge = random_fridge(db)
