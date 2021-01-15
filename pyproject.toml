@@ -6,7 +6,7 @@ authors = ["r2r <aart.st@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
-pydantic = "^1.7.3"
+pydantic = {version = "^1.7.3"}
 attrs = "^20.3.0"
 sqlalchemy = "^1.3.22"
 fastapi = "^0.63.0"
@@ -14,6 +14,7 @@ fastapi = "^0.63.0"
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"
 requests = "^2.25.1"
+pytest-dotenv = "^0.5.2"
 
 [build-system]
 requires = ["poetry>=0.12"]
@@ -22,4 +23,8 @@ build-backend = "poetry.masonry.api"
 [tool.pytest.ini_options]
 markers = [
     "end2end",
+]
+
+env_files = [
+    ".dev.env",
 ]
