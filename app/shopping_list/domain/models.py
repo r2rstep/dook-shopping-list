@@ -61,7 +61,7 @@ class FridgeLogic:
 
 @attr.s(auto_attribs=True)
 class ShoppingListLogic:
-    _fridge: FridgeLogic
+    _fridge: FridgeLogic = None
     shopping_list: ShoppingList = None
 
     def create(self, recipes: List[Recipe]):

@@ -47,8 +47,7 @@ def test_adding_product_to_fridge_should_decrease_its_quantity_on_shopping_list(
     del expected_list['pear']
     expected_list['avocado'] = 1
 
-    logic = models.ShoppingListLogic(models.FridgeLogic(fridge=models.Fridge(owner=0, products=[])),
-                                     shopping_list)
+    logic = models.ShoppingListLogic(shopping_list=shopping_list)
     logic.update(added_products)
 
     assert logic.shopping_list.items == expected_list
