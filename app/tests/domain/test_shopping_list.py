@@ -51,3 +51,18 @@ def test_adding_product_to_fridge_should_decrease_its_quantity_on_shopping_list(
     logic.update(added_products)
 
     assert logic.shopping_list.items == expected_list
+
+
+def test_removing_product_from_fridge_should_increase_its_quantity_on_shopping_list():
+    shopping_list = models.ShoppingList(items=dict(pear=1, almond=60, salad=1, avocado=2))
+    expected_list = copy.deepcopy(shopping_list.items)
+    removed_products = [models.ProductInFridge(name='pear', quantity=-1),
+                        models.ProductInFridge(name='watermelon', quantity=1),
+                        models.ProductInFridge(name='avocado', quantity=-1)]
+    expected_list['pear'] += 1
+    expected_list['avocado'] += 1
+
+    logic = models.ShoppingListLogic(shopping_list=shopping_list)
+    logic.update(removed_products)
+
+    assert logic.shopping_list.items == expected_list
