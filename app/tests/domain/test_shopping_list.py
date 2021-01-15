@@ -1,4 +1,7 @@
 import copy
+from typing import List
+
+import pytest
 
 from shopping_list.domain import models
 
@@ -38,31 +41,22 @@ def test_create_shopping_list():
     assert next(filter(lambda p: p.name == 'goat cheese', fridge.products)).allocated_quantity == 80.0
 
 
-def test_adding_product_to_fridge_should_decrease_its_quantity_on_shopping_list():
+@pytest.mark.parametrize('changed_products,expected_list',
+                         [([models.ProductInFridge(name='pear', quantity=1),
+                            models.ProductInFridge(name='watermelon', quantity=1),
+                            models.ProductInFridge(name='avocado', quantity=1)],
+                           dict(almond=60, salad=1, avocado=1)),
+                          ([models.ProductInFridge(name='pear', quantity=-1),
+                            models.ProductInFridge(name='watermelon', quantity=1),
+                            models.ProductInFridge(name='avocado', quantity=-1)],
+                           dict(pear=2, almond=60, salad=1, avocado=3))])
+def test_changing_fridge_contents_should_change_its_quantity_on_shopping_list(
+        changed_products: List[models.ProductInFridge],
+        expected_list: dict
+):
     shopping_list = models.ShoppingList(items=dict(pear=1, almond=60, salad=1, avocado=2))
-    expected_list = copy.deepcopy(shopping_list.items)
-    added_products = [models.ProductInFridge(name='pear', quantity=1),
-                      models.ProductInFridge(name='watermelon', quantity=1),
-                      models.ProductInFridge(name='avocado', quantity=1)]
-    del expected_list['pear']
-    expected_list['avocado'] = 1
 
     logic = models.ShoppingListLogic(shopping_list=shopping_list)
-    logic.update(added_products)
-
-    assert logic.shopping_list.items == expected_list
-
-
-def test_removing_product_from_fridge_should_increase_its_quantity_on_shopping_list():
-    shopping_list = models.ShoppingList(items=dict(pear=1, almond=60, salad=1, avocado=2))
-    expected_list = copy.deepcopy(shopping_list.items)
-    removed_products = [models.ProductInFridge(name='pear', quantity=-1),
-                        models.ProductInFridge(name='watermelon', quantity=1),
-                        models.ProductInFridge(name='avocado', quantity=-1)]
-    expected_list['pear'] += 1
-    expected_list['avocado'] += 1
-
-    logic = models.ShoppingListLogic(shopping_list=shopping_list)
-    logic.update(removed_products)
+    logic.update(changed_products)
 
     assert logic.shopping_list.items == expected_list
