@@ -42,7 +42,7 @@ def test_create_shopping_list():
 
 
 @pytest.mark.parametrize('changed_products,expected_list',
-                         [([models.ProductInFridge(name='pear', quantity=1),
+                         [([models.ProductInFridge(name='pear', quantity=2),
                             models.ProductInFridge(name='watermelon', quantity=1),
                             models.ProductInFridge(name='avocado', quantity=1)],
                            dict(almond=60, salad=1, avocado=1)),

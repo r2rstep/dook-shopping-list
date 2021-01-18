@@ -81,7 +81,7 @@ class ShoppingListLogic:
         for changed_product in products_changes:
             if changed_product.name in self.shopping_list.items:
                 self.shopping_list.items[changed_product.name] -= changed_product.quantity
-                if not self.shopping_list.items[changed_product.name]:
+                if self.shopping_list.items[changed_product.name] <= 0:
                     del self.shopping_list.items[changed_product.name]
     
     def _add(self, ingredient_in_recipe: Ingredient, quantity_available_in_fridge: float = 0.0):
