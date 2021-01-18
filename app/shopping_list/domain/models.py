@@ -28,6 +28,7 @@ class Recipe(BaseModel):
 
 
 class ShoppingList(BaseModel):
+    id: int = None
     items: Dict[str, float]
 
     class Config:
