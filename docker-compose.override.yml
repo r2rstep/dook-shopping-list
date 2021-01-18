@@ -1,0 +1,11 @@
+version: "3.3"
+services:
+
+  db:
+    environment:
+      - POSTGRES_DB=test
+
+  backend:
+    volumes:
+      - ./app:/app
+    command: bash -c "uvicorn --reload --host 0.0.0.0 shopping_list.api.web:app"

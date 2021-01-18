@@ -3,5 +3,5 @@ from sqlalchemy.orm import sessionmaker
 
 from shopping_list.config import config
 
-engine = create_engine(f'{config.DB_PROTOCOL}://{config.DB_SERVER}')
+engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
 Session = sessionmaker(bind=engine)

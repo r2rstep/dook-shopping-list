@@ -1,0 +1,49 @@
+version: "3.3"
+services:
+
+  db:
+    image: postgres:12
+    volumes:
+      - app-db-data:/var/lib/postgresql/data/pgdata
+    env_file:
+      - .env
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    networks:
+      - pg
+      - backend
+    ports:
+      - "5432:5432"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - "5050:5050"
+    networks:
+      - pg
+    depends_on:
+      - db
+    env_file:
+      - .env
+
+  backend:
+    image: shopping_list
+    depends_on:
+      - db
+    ports:
+      - 3000:8000
+    env_file:
+      - .env
+    networks:
+      - backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: bash -c "uvicorn --host 0.0.0.0 shopping_list.api.web:app"
+
+volumes:
+  app-db-data:
+
+networks:
+  backend:
+  pg:
