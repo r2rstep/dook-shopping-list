@@ -15,4 +15,4 @@ RUN poetry install --no-root --no-dev
 COPY app /app
 ENV PYTHONPATH=/app
 
-CMD bash -c "uvicorn --host 0.0.0.0 shopping_list.api.web:app"
+CMD bash -c "python shopping_list/init.py && uvicorn --host 0.0.0.0 shopping_list.api.web:app"

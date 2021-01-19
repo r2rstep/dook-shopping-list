@@ -8,4 +8,4 @@ services:
   backend:
     volumes:
       - ./app:/app
-    command: bash -c "uvicorn --reload --host 0.0.0.0 shopping_list.api.web:app"
+    command: bash -c "python shopping_list/init.py && uvicorn --reload --host 0.0.0.0 shopping_list.api.web:app"
