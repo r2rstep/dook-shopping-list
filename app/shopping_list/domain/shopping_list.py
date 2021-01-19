@@ -3,20 +3,7 @@ from typing import List, Dict
 import attr
 from pydantic import BaseModel
 
-
-class Ingredient(BaseModel):
-    name: str
-    quantity: float
-
-    class Config:
-        orm_mode = True
-
-
-class ProductInFridge(Ingredient):
-    allocated_quantity: float = 0.0
-
-    class Config:
-        orm_mode = True
+from .fridge import Ingredient, ProductInFridge, FridgeLogic
 
 
 class Recipe(BaseModel):
@@ -30,34 +17,10 @@ class Recipe(BaseModel):
 class ShoppingList(BaseModel):
     id: int = None
     items: Dict[str, float]
+    fridge_id: int = None
 
     class Config:
         orm_mode = True
-
-
-class Fridge(BaseModel):
-    id: int = None
-    owner: int
-    products: List[ProductInFridge]
-
-    class Config:
-        orm_mode = True
-
-
-@attr.s(auto_attribs=True)
-class FridgeLogic:
-    fridge: Fridge
-
-    def allocate_product(self, ingredient: Ingredient):
-        ingredient_in_fridge = next(filter(lambda product: product.name == ingredient.name,
-                                           self.fridge.products))
-        ingredient_in_fridge.allocated_quantity += ingredient.quantity
-        this_allocation_quantity = ingredient.quantity
-        if ingredient_in_fridge.allocated_quantity > ingredient_in_fridge.quantity:
-            this_allocation_quantity = ingredient.quantity - (ingredient_in_fridge.allocated_quantity -
-                                                              ingredient_in_fridge.quantity)
-            ingredient_in_fridge.allocated_quantity = ingredient_in_fridge.quantity
-        return this_allocation_quantity
 
 
 @attr.s(auto_attribs=True)
@@ -66,7 +29,7 @@ class ShoppingListLogic:
     shopping_list: ShoppingList = None
 
     def create(self, recipes: List[Recipe]):
-        self.shopping_list = ShoppingList(items={})
+        self.shopping_list = ShoppingList(items={}, fridge_id=self._fridge.fridge.id)
         for recipe in recipes:
             for ingredient_in_recipe in recipe.ingredients:
                 quantity_available_in_fridge = 0

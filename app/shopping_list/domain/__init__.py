@@ -1,1 +1,1 @@
-from . import commands, models
+from . import commands, fridge, shopping_list
