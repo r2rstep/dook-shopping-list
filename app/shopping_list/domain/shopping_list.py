@@ -46,6 +46,7 @@ class ShoppingListLogic:
         for changed_product in products_changes:
             if changed_product.name in self.shopping_list.items:
                 self.shopping_list.items[changed_product.name] -= changed_product.quantity
+                self._fridge.allocate_product(changed_product)
                 if self.shopping_list.items[changed_product.name] <= 0:
                     del self.shopping_list.items[changed_product.name]
     

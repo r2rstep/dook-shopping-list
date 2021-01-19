@@ -40,9 +40,12 @@ class FridgeLogic:
     fridge: Fridge
     events: List[Event] = attr.ib(factory=list)
 
-    def allocate_product(self, ingredient: Ingredient):
-        ingredient_in_fridge = next(filter(lambda product: product.name == ingredient.name,
-                                           self.fridge.products))
+    def allocate_product(self, ingredient: Ingredient) -> float:
+        try:
+            ingredient_in_fridge = next(filter(lambda product: product.name == ingredient.name,
+                                               self.fridge.products))
+        except StopIteration:
+            return 0
         ingredient_in_fridge.allocated_quantity += ingredient.quantity
         this_allocation_quantity = ingredient.quantity
         if ingredient_in_fridge.allocated_quantity > ingredient_in_fridge.quantity:
