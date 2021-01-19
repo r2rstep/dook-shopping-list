@@ -22,11 +22,13 @@ def test_create_shopping_list():
     shopping_list = ShoppingListLogic(FridgeLogic(fridge))
     shopping_list.create([
         Recipe(
+            name='salad',
             ingredients=[Ingredient(name='salad', quantity=1),
                          Ingredient(name='pear', quantity=1),
                          Ingredient(name='almond', quantity=40),
                          Ingredient(name='goat cheese', quantity=80)]),
         Recipe(
+            name='salad',
             ingredients=[Ingredient(name='avocado', quantity=3),
                          Ingredient(name='almond', quantity=20),
                          Ingredient(name='salad', quantity=1)]

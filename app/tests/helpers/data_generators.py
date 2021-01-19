@@ -10,7 +10,7 @@ from .utils import random_lower_string
 
 
 def random_recipe(session: Session) -> shopping_list_models.Recipe:
-    recipe = shopping_list_models.Recipe(ingredients=[])
+    recipe = shopping_list_models.Recipe(name=random_lower_string(), ingredients=[])
     for idx in range(0, random.randint(3, 10)):
         recipe.ingredients.append(random_product(shopping_list_models.Ingredient))
     return repos.recipe.add(session, obj_in=recipe)[1]

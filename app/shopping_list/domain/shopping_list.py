@@ -8,6 +8,7 @@ from .fridge import Ingredient, ProductInFridge, FridgeLogic
 
 class Recipe(BaseModel):
     id: int = None
+    name: str
     ingredients: List[Ingredient]
 
     class Config:
