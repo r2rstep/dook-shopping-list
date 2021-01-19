@@ -47,8 +47,8 @@ def test_change_fridge_contents_should_update_shopping_list(db: Session, client:
     assert shopping_list_v1.shopping_list.items
 
     # add products from the shopping list so that the updated shopping list becomes empty
-    products_changes = list(map(lambda p: domain.fridge.ProductInFridge(name=p[0],
-                                                                        quantity=p[1]),
+    products_changes = list(map(lambda p: domain.fridge.ProductUpdate(name=p[0],
+                                                                      quantity=p[1]),
                                 shopping_list_v1.shopping_list.items.items()))
     shopping_list = client.patch(f'/fridges/{fridge.id}/products',
                                  json=domain.commands.ChangeFridgeContents(products=products_changes).dict())

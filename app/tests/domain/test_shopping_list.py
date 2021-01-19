@@ -1,5 +1,6 @@
-from shopping_list.domain.fridge import ProductInFridge, FridgeLogic, Ingredient, Fridge
-from shopping_list.domain.shopping_list import ShoppingListLogic, ShoppingList, Recipe
+from shopping_list.domain.fridge import ProductInFridge, FridgeLogic, Fridge, ProductUpdate
+from shopping_list.domain.shopping_list import ShoppingListLogic, ShoppingList
+from shopping_list.domain.recipe import Ingredient, Recipe
 
 
 def test_create_shopping_list():
@@ -47,7 +48,7 @@ def test_removing_fridge_contents_should_increase_quantity_on_shopping_list_and_
     expected_fridge = Fridge(products=[ProductInFridge(name='avocado', quantity=1, allocated_quantity=1)],
                              owner=0)
     logic = ShoppingListLogic(shopping_list=shopping_list, fridge=FridgeLogic(fridge))
-    logic.update([ProductInFridge(name='pear', quantity=-1), ProductInFridge(name='avocado', quantity=-1)])
+    logic.update([ProductUpdate(name='pear', quantity=-1), ProductUpdate(name='avocado', quantity=-1)])
 
     assert logic.shopping_list.items == dict(pear=2, almond=60, salad=1, avocado=3)
     assert fridge == expected_fridge
@@ -63,9 +64,9 @@ def test_adding_fridge_contents_should_decrease_quantity_on_shopping_list_and_up
                                        ProductInFridge(name='avocado', quantity=1, allocated_quantity=1)],
                              owner=0)
     logic = ShoppingListLogic(shopping_list=shopping_list, fridge=FridgeLogic(fridge))
-    logic.update([ProductInFridge(name='pear', quantity=2),
-                  ProductInFridge(name='watermelon', quantity=1),
-                  ProductInFridge(name='avocado', quantity=1)])
+    logic.update([ProductUpdate(name='pear', quantity=2),
+                  ProductUpdate(name='watermelon', quantity=1),
+                  ProductUpdate(name='avocado', quantity=1)])
 
     assert logic.shopping_list.items == dict(almond=60, salad=1, avocado=1)
     assert fridge == expected_fridge

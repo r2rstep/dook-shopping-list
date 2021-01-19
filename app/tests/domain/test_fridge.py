@@ -10,7 +10,7 @@ class TestProductsAllocation:
         logic = fridge_models.FridgeLogic(fridge)
 
         fully_allocated_product = copy.deepcopy(fridge.products[0])
-        assert logic.allocate_product(fridge_models.Ingredient(**fully_allocated_product.dict())) == \
+        assert logic.allocate_product(fridge_models.ProductBase(**fully_allocated_product.dict())) == \
                fully_allocated_product.quantity
         assert fridge.products[0].allocated_quantity == fully_allocated_product.quantity
 
@@ -20,7 +20,7 @@ class TestProductsAllocation:
 
         partially_allocated_product = copy.deepcopy(fridge.products[0])
         partially_allocated_product.quantity *= 0.5
-        allocation_req = fridge_models.Ingredient(**partially_allocated_product.dict())
+        allocation_req = fridge_models.ProductBase(**partially_allocated_product.dict())
         assert logic.allocate_product(allocation_req) == partially_allocated_product.quantity
         assert fridge.products[0].allocated_quantity == partially_allocated_product.quantity
 
@@ -30,7 +30,7 @@ class TestProductsAllocation:
 
         over_allocation_req = copy.deepcopy(fridge.products[0])
         over_allocation_req.quantity *= 1.5
-        allocation_req = fridge_models.Ingredient(**over_allocation_req.dict())
+        allocation_req = fridge_models.ProductBase(**over_allocation_req.dict())
         assert logic.allocate_product(allocation_req) == fridge.products[0].quantity
         assert fridge.products[0].allocated_quantity == fridge.products[0].quantity
 
@@ -41,16 +41,17 @@ def test_contents_update():
     changed_products = copy.deepcopy(fridge.products[0:2])
     changed_products[0].quantity *= 0.5
     changed_products[1].quantity = 0
-    new_product = random_product(fridge_models.ProductInFridge)
-    products_diff = [fridge_models.ProductInFridge(
+    new_product = random_product(fridge_models.ProductUpdate)
+    products_diff = [fridge_models.ProductUpdate(
         name=changed.name,
         quantity=changed.quantity - current.quantity) for changed, current in zip(changed_products,
                                                                                   fridge.products)]
     products_diff.append(new_product)
-    expected_products = [changed_products[0]] + copy.deepcopy(fridge.products[2:]) + [new_product]
+    expected_products = [changed_products[0]] + copy.deepcopy(fridge.products[2:]) + [
+        fridge_models.ProductInFridge(**new_product.dict())]
 
     logic = fridge_models.FridgeLogic(fridge)
-    logic.update_contents(changed_products + [new_product])
+    logic.update_contents([fridge_models.ProductUpdate(**p.dict()) for p in changed_products + [new_product]])
 
     assert logic.fridge.products == expected_products
 

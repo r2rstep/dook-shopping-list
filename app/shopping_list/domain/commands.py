@@ -2,7 +2,7 @@ from typing import List
 
 from pydantic import BaseModel
 
-from .fridge import ProductInFridge
+from .fridge import ProductUpdate
 
 
 class CreateShoppingList(BaseModel):
@@ -10,4 +10,4 @@ class CreateShoppingList(BaseModel):
 
 
 class ChangeFridgeContents(BaseModel):
-    products: List[ProductInFridge]
+    products: List[ProductUpdate]

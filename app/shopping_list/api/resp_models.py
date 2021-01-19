@@ -8,5 +8,5 @@ class ShoppingList(BaseModel):
         self: str = ''
         fridge: str = ''
 
-    shopping_list: domain.shopping_list.ShoppingList
+    shopping_list: domain.shopping_list.ShoppingListBase
     links: Links = Links()
